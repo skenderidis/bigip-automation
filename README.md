@@ -6,7 +6,7 @@ For F5 administrators, leveraging Terraform with AS3 can drastically reduce the 
 
 In this article, we'll explore how to automate the configuration of F5 application services using Terraform and F5's AS3 Per-App templates. We have created multiple Terraform modules, each corresponding to a specific AS3 template. Currently for this example, we have created two modules for HTTP and HTTPS configurations. When these modules are invoked from the main module, they automate the creation of application configurations on the F5 device. This approach simplifies the deployment process and makes it easier to manage and scale applications.
 
-![terraform-f5](https://github.com/skenderidis/bigip-automation/images/terraform-f5.png)
+![terraform-f5](https://github.com/skenderidis/bigip-automation/terraform-f5.png)
 
 # Table of Contexts
 
@@ -34,16 +34,16 @@ To create this automation use-case, we leverage the following technologies:
 In the following section, we will provide a detailed explanation of the code that forms the foundation of this automation framework. This will help you understand how the various components work together to automate the configuration of F5 application services using Terraform and AS3 templates.
 
 ### *AS3_HTTP* Module
-The HTTP module is designed to create an HTTP application configuration on an F5 device using AS3 Per-App templates. Here is an overview of the files and their roles:
+The HTTP module is designed to create an HTTP VirtualServer configuration on a BIGIP device using AS3 Per-App templates. The files for this module can be found under the directory ***`code->modules->as3_http`***.
 
-- as3.tpl
-- main.tf
-- variables.tf
+Here is an overview of the files and their roles:
 
-These files can be found on the repository under the directory ***`code->modules->as3_http`***
+**main.tf**
 
-#### main.tf
-The main.tf file contains the Terraform configuration that defines the HTTP application. Below is a detailed breakdown of its contents:
+The **main.tf** file contains the Terraform configuration that creates the HTTP VirtualServer. Below is a detailed breakdown of its contents:
+- The first block defines the version of the F5 BIG-IP provider that will be used.
+- The second block uses the **f5bigip_as3** resource to deploy the AS3 Application. The `as3_json` parameter is populated by a template file (as3.tpl), which is passed variables like tenant, application name, service port, pool members and other variables.
+- The third block outputs the response from the F5 device after deploying the configuration.
 
 ```tf
 terraform {
@@ -73,15 +73,14 @@ output "as3" {
 }
 ```
 
-This configuration does the following:
+**as3.tpl**
 
- - Defines the F5 BIG-IP provider with necessary credentials and address.
- - Uses the f5bigip_as3 resource to deploy an AS3 application. The as3_json parameter is populated by a template file (as3.tpl), which is passed variables like tenant, application name, service port, and pool members.
- - Outputs the response from the F5 device after deploying the configuration.
+The as3.tpl file is an AS3 template used to define the HTTP application. This template performs the following tasks:
 
-
-#### as3.tpl
-The as3.tpl file is an AS3 template used to define the HTTP application. Below is a detailed breakdown of its contents:
+ - Defines an AS3 declaration for an HTTP application.
+ - Creates a tenant and an application within that tenant.
+ - Configures an HTTP service with a virtual address and associates it with a pool of servers.
+ - Uses variables for tenant, application name, virtual address, service port, and pool members, allowing for flexible and reusable config
 
 ```tf
 {
@@ -108,23 +107,49 @@ The as3.tpl file is an AS3 template used to define the HTTP application. Below i
   }
 }
 ```
-This template performs the following tasks:
+**variables.tf**
 
- - Defines an AS3 declaration for an HTTP application.
- - Creates a tenant and an application within that tenant.
- - Configures an HTTP service with a virtual address and associates it with a pool of servers.
- - Uses variables for tenant, application name, virtual address, service port, and pool members, allowing for flexible and reusable configurations.
+The variables.tf defines the variables that will be used by the `as3.tpl` on this module:
 
+```tf
+###########   AS3 Variables   ############
+variable partition	{
+  description = "Partition that the AS3 will be deployed to"
+  type        = string
+}
+variable name	{
+  description = "Name of the Virtual Server"
+  type        = string
+}
+variable virtualIP	{
+  description = "IP for Virtual Server"
+  type        = string
+}
+variable virtualPort  {
+  description = "Port for Virtual Server"
+  type        = number  
+  default     = 0
+}
+variable serverAddresses  {
+  description = "List of IPs for Pool Members"
+  type        = list(string)
+}
+variable servicePort  {
+  description = "Port of the Pool Members"
+  type        = number
+}
+
+```
 
 ### *AS3_HTTPS* Module
-The HTTPS module is designed to create an HTTPS application configuration on an F5 device using AS3 Per-App templates. This module is exactly like the previous module (AS3_HTTP) but with a different template and variable that define the Client SSL Profile that is stored on Common Partition :
+The HTTPS module is designed to create an HTTPS Virtual Server configuration on a BIGIP device using AS3 Per-App templates. This module is exactly like the previous module (AS3_HTTP) but with a different template and variable that define the Client SSL Profile that is stored on Common Partition. The files for this module can be found under the directory ***`code->modules->as3_https`***.
 
 
 ### *Main* Module
-The main module orchestrates the deployment of the HTTP and HTTPS application configurations on the F5 device by invoking the respective modules. For each application you want to create, you will need to create a separate `appX.tf` file. Additionally, the main module includes the `providers.tf` file to define the F5 BIG-IP providers. 
+The main module orchestrates the deployment of the HTTP and HTTPS VirtualServer configurations on the F5 device by invoking the respective modules. For each VirtualServer you want to create, you will need to create a separate `appX.tf` file (or append the relevant configuration on the existing file). Additionally, the main module includes the `providers.tf` file that defines multiple F5 BIG-IP providers, each corresponding to a single BIGIP device. 
 
 
-#### appX.tf
+**appX.tf**
 
 ```tf
 module "appX" {
