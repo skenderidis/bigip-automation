@@ -6,6 +6,8 @@ For F5 administrators, leveraging Terraform with AS3 can drastically reduce the 
 
 In this article, we'll explore how to automate the configuration of F5 application services using Terraform and F5's AS3 Per-App templates. We have created multiple Terraform modules, each corresponding to a specific AS3 template. Currently for this example, we have created two modules for HTTP and HTTPS configurations. When these modules are invoked from the main module, they automate the creation of application configurations on the F5 device. This approach simplifies the deployment process and makes it easier to manage and scale applications.
 
+![terraform-f5](https://github.com/skenderidis/bigip-automation/images/terraform-f5.png)
+
 # Table of Contexts
 
 - [Technologies used](#technologies-used)
@@ -23,14 +25,13 @@ In this article, we'll explore how to automate the configuration of F5 applicati
 
 To create this automation use-case, we leverage the following technologies:
 
-**AS3**. AS3 furnishes a declarative interface, enabling the management of application-specific configurations on a BIG-IP system. By providing a JSON declaration rather than a series of imperative commands, AS3 ensures precise configuration orchestration. We utilize the latest Per-App AS3 feature to optimize configuration granularity. You can find more information on [https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/)
+- **AS3**. AS3 furnishes a declarative interface, enabling the management of application-specific configurations on a BIG-IP system. By providing a JSON declaration rather than a series of imperative commands, AS3 ensures precise configuration orchestration. We utilize the latest Per-App AS3 feature to optimize configuration granularity. You can find more information on [https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/)
 
-**F5 BIG-IP Terraform Provider**. The F5 BIG-IP Terraform Provider helps you manage and provision your BIG-IP configurations in Terraform through the use of AS3/DO integration.You can find more information on [https://registry.terraform.io/providers/F5Networks/bigip/latest/docs](https://registry.terraform.io/providers/F5Networks/bigip/latest/docs)
-
+- **F5 BIG-IP Terraform Provider**. The F5 BIG-IP Terraform Provider helps you manage and provision your BIG-IP configurations in Terraform through the use of AS3/DO integration.You can find more information on [https://registry.terraform.io/providers/F5Networks/bigip/latest/docs](https://registry.terraform.io/providers/F5Networks/bigip/latest/docs)
 
 
 ## Code Explanation
-In the following section we will explain the code that we have build in order to make this automation framework possible
+In the following section, we will provide a detailed explanation of the code that forms the foundation of this automation framework. This will help you understand how the various components work together to automate the configuration of F5 application services using Terraform and AS3 templates.
 
 ### *AS3_HTTP* Module
 The HTTP module is designed to create an HTTP application configuration on an F5 device using AS3 Per-App templates. Here is an overview of the files and their roles:
