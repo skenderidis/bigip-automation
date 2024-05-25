@@ -10,13 +10,18 @@ In this article, we'll explore how to automate the configuration of F5 applicati
 
 - [Technologies used](#technologies-used)
 - [Code Explanation](#code-explanation)
-- [AS3_HTTP Module](#as3_http-module)
-- []()
-- 
+  - [AS3_HTTP Module](#as3_http-module)
+  - [AS3_HTTPS Module](#as3_https-module)
+  - [Main Module](#main-module)
+- [Best Practicies](#best-practices)
+  - [Deploying Services with Terraform](#deploying-services-with-terraform)
+  - [Terraform Plan parameters](#terraform-plan-parameters)
+  - [Terraform Apply parameters](#terraform-apply-parameters)
+- [Demo](#Demo)
 
 # Technologies used
 
-To create this automation us-ecase, we leverage the following technologies. These include:
+To create this automation use-case, we leverage the following technologies:
 
 **AS3**. AS3 furnishes a declarative interface, enabling the management of application-specific configurations on a BIG-IP system. By providing a JSON declaration rather than a series of imperative commands, AS3 ensures precise configuration orchestration. We utilize the latest Per-App AS3 feature to optimize configuration granularity. You can find more information on [https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/](https://clouddocs.f5.com/products/extensions/f5-appsvcs-extension/latest/)
 
@@ -25,16 +30,16 @@ To create this automation us-ecase, we leverage the following technologies. Thes
 
 
 ## Code Explanation
-In the following section we will explain the code that we have build to make this automation framework possible
+In the following section we will explain the code that we have build in order to make this automation framework possible
 
 ### *AS3_HTTP* Module
 The HTTP module is designed to create an HTTP application configuration on an F5 device using AS3 Per-App templates. Here is an overview of the files and their roles:
 
--as3.tpl
-─main.tf
-─variables.tf
+- as3.tpl
+- main.tf
+- variables.tf
 
-These files can be found on the repository under the directory ***code->modules->as3_http***/
+These files can be found on the repository under the directory ***`code->modules->as3_http`***
 
 #### main.tf
 The main.tf file contains the Terraform configuration that defines the HTTP application. Below is a detailed breakdown of its contents:
@@ -110,11 +115,11 @@ This template performs the following tasks:
  - Uses variables for tenant, application name, virtual address, service port, and pool members, allowing for flexible and reusable configurations.
 
 
-### *AS3_HTTPS* Module Explanation
+### *AS3_HTTPS* Module
 The HTTPS module is designed to create an HTTPS application configuration on an F5 device using AS3 Per-App templates. This module is exactly like the previous module (AS3_HTTP) but with a different template and variable that define the Client SSL Profile that is stored on Common Partition :
 
 
-### *Main* Module Explanation
+### *Main* Module
 The main module orchestrates the deployment of the HTTP and HTTPS application configurations on the F5 device by invoking the respective modules. For each application you want to create, you will need to create a separate `appX.tf` file. Additionally, the main module includes the `providers.tf` file to define the F5 BIG-IP providers. 
 
 
